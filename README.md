@@ -1,3 +1,9 @@
+  ![Python](https://img.shields.io/badge/Python-3.14-3776AB?style=flat-square&logo=python&logoColor=white)
+  ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-15-4169E1?style=flat-square&logo=postgresql&logoColor=white)
+  ![Pandas](https://img.shields.io/badge/pandas-latest-150458?style=flat-square&logo=pandas&logoColor=white)
+  ![SQLAlchemy](https://img.shields.io/badge/SQLAlchemy-latest-D71F00?style=flat-square&logo=sqlalchemy&logoColor=white)
+  ![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=flat-square)
+
   # Pipeline de Dados — Viagens a Serviço (Portal da Transparência)
 
   ## 📌 O Problema
