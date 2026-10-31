@@ -34,11 +34,9 @@
   `gold_transport_modes`, etc.) e views (`vw_gold_*`) estão em **inglês**.
 
   Exceções deliberadas:
-  - **Documentação (README, comentários em Markdown, relatórios)** está em
-    **português**, para facilitar a leitura pela banca avaliadora e pelo
-    público-alvo do projeto (gestores públicos e cidadãos brasileiros).
-  - **Dados em si** permanecem no idioma original da fonte (português,
-    conforme publicado pelo Portal da Transparência).
+  - **Documentação e Relatórios** (README, células de texto do Jupyter, relatórios HTML) estão em **português**, para facilitar a leitura pela banca avaliadora e pelo público-alvo do projeto (gestores públicos e cidadãos brasileiros).
+  - **Código-fonte e Comentários no Código** (variáveis, funções, docstrings, comentários `#` no Python e SQL) estão em **inglês**, seguindo o padrão internacional de Engenharia de Software.
+  - **Dados em si** permanecem no idioma original da fonte (português, conforme publicado pelo Portal da Transparência).
 
   Essa separação — **código em inglês, documentação em português** — é
   intencional e reflete a prática comum em equipes de dados que atendem
@@ -46,20 +44,30 @@
 
   O projeto foi desenhado seguindo os três níveis clássicos de modelagem de dados:
 
+  ## 📊 Visualizações (Prévia dos Relatórios)
+
+  Abaixo, uma prévia visual dos insights extraídos dos dados de viagens. Os relatórios executivos completos, formatados e prontos para leitura estão disponíveis na seção [Documentação Adicional](#-documentação-adicional) ao longo deste documento.
+
+  | Top 5 Órgãos por Custo | Top 3 Destinos por Custo Médio |
+  | :---: | :---: |
+  | ![Gráfico Q1](docs/preview_q1.png) | ![Gráfico Q2](docs/preview_q2.png) |
+
   ## 📂 Estrutura do Repositório
   ```text
   ├── data/                 # Pasta gerada automaticamente pelos scripts (ignorada pelo Git)
   │   └── raw/              # Onde o .zip e os arquivos CSV são salvos
   ├── docs/   
   │   ├── enunciado.pdf     # Documento original do projeto (regras e requisitos)
-  │   ├── relatorio_analise.pdf # Relatório executivo com os gráficos gerados
-  │   ├── relatorio_analise_EN.html   # Relatório em inglês (gerado por 3_analise_EN.py)
+  │   ├── relatorio_analise_BR.html   # Relatório em Português (gerado por 3_analise_BR.py)
+  │   ├── relatorio_analise_EN.html   # Relatório em Inglês (gerado por 3_analise_EN.py)
+  │   ├── preview_q1.png                # Screenshots para o README
+  │   ├── preview_q2.png                # Screenshots para o README
   │   ├── modelo_conceitual_dark.png
   │   ├── modelo_conceitual_light.png
   │   ├── modelo_logico_dark.png
   │   └── modelo_logico_light.png
   ├── outputs/              # Pasta gerada automaticamente (ignorada pelo Git)
-  │   └── pipeline.log      # Log de execução completo do pipeline
+  │   ├── pipeline.log      # Log de execução completo do pipeline
   │   ├── relatorio_analise_EN.md        # Subproduto local do 3_analise_EN.py
   │   └── figures/          # Gráficos PNG em inglês (gerados por 3_analise_EN.py)
   │       ├── q1_top_agencies.png
@@ -107,7 +115,7 @@
   Clone o repositório e crie um ambiente virtual:
   ```bash
   python -m venv .venv
-  source .venv/bin/activate  # No Windows: .\.venv\Scripts\Activate.ps1
+  source .venv/bin/activate  # Windows: .\.venv\Scripts\Activate.ps1
   ```
 
   Instale as dependências:
@@ -140,7 +148,7 @@
   > **Como obter o `DRIVE_FILE_ID`:** 
   > O ID é o código único do arquivo `.zip` hospedado no Google Drive. Para encontrá-lo, abra o link de compartilhamento do arquivo (ex: `https://drive.google.com/file/d/1pQjKacyHdIsyteknQbwKGM5_4hL5V4RV/view?usp=sharing`). O ID é o trecho entre `/d/` e `/view` (no exemplo: `1pQjKacyHdIsyteknQbwKGM5_4hL5V4RV`).
 
-  ### 4. Execução do Pipeline
+  ### 4. Execução do Pipeline — Camadas Raw e Silver (ETL)
 
   O pipeline é **idempotente** (pode ser reexecutado várias vezes sem duplicar dados) e segue os princípios da Arquitetura Medallion. Para entender a esteira de dados, os arquivos têm as seguintes funções:
 
@@ -166,15 +174,25 @@
   python 1_extrair.py
   python 2_transformar.py
   ```
-  Por fim, abra o arquivo `3_analise.ipynb` no VS Code ou Jupyter e execute todas as células.
 
-  Geração de Relatórios Executivos (Opcional)
-  Para gerar os arquivos HTML independentes (com imagens embutidas e formatados para leitura executiva), rode:
+  ### 5. Execução do Pipeline — Camada Gold (Análise de Dados)
+  
+  Com as camadas Raw e Silver populadas, a próxima etapa é a criação da camada Gold (agregações, views e métricas).
+  Abra o arquivo `3_analise.ipynb` no VS Code ou Jupyter e execute todas as células. O notebook fará a conexão com o banco, criará as tabelas e views gold_* e exibirá os gráficos interativos com os insights de negócio.
+
+  ### 6. Geração de Relatórios Executivos (Opcional)
+
+  Para gerar os arquivos HTML independentes (com imagens embutidas em base64 e formatados para leitura executiva), execute os scripts da pasta `reports/`. 
+  
+  Os dois scripts geram o mesmo relatório, com os mesmos dados e gráficos, mas em idiomas diferentes:  
+  *   **`3_analise_BR.py`**: Gera o relatório em **Português**.
+  *   **`3_analise_EN.py`**: Gera o relatório em **Inglês**.
+
   ```bash
   python reports/3_analise_BR.py
   python reports/3_analise_EN.py
   ```
-  Os relatórios finais serão salvos na pasta docs/. 
+  Os relatórios finais serão salvos na pasta docs/  ([relatorio_analise_BR.html](docs/relatorio_analise_BR.html) e [relatorio_analise_EN.html](docs/relatorio_analise_EN.html)).
 
   *(Nota técnica: Para garantir alta performance no carregamento de mais de 300 mil registros, o pipeline utiliza `COPY FROM STDIN` na camada Raw e `psycopg2.extras.execute_values` na camada Silver, substituindo o lento `pandas.to_sql`).*
 
@@ -413,3 +431,7 @@
 
   ---
   *Desenvolvido como Projeto Avaliativo do Módulo 1 (Análise de Dados com Python - SCTEC).*
+
+  ---
+## 🏷️ Topics (GitHub)
+`data-engineering` · `etl-pipeline` · `medallion-architecture` · `python` · `postgresql` · `sqlalchemy` · `pandas` · `data-analysis` · `brazilian-government` · `transparency-portal`
